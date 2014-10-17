@@ -4,6 +4,7 @@ var mountFolder = function (connect, dir) {
     return connect.static(require('path').resolve(dir));
 };
 
+var vendors = 'jquery backbone backbone.marionette'.split(' ');
 // # Globbing
 // for performance reasons we're only matching one level down:
 // 'test/spec/{,*/}*.js'
@@ -25,19 +26,43 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         yeoman: yeomanConfig,
-
+        browserify: {
+            app: {
+                src: "scripts/app.js",
+                dest: "build/app.js",
+                options: {
+                    debug: true,
+                    extension: [".hbs"],
+                    transform: ["hbsfy"],
+                    extenal: vendors
+                }
+            },
+            vendors: {
+                files: {
+                    "build/vendors.js": []
+                },
+                options: {
+                    "require": vendors
+                }
+            },
+            bundle: {
+                src: "src/app.js",
+                dest: "dist/bundle.js",
+                options: {
+                    extensions: [".hb"],
+                    transform: ["hbsfy"]
+                }
+            }
+        },
         // watch list
         watch: {
-
             livereload: {
                 files: [
-
                     'scripts/{,**/}*.js',
                     'templates/{,**/}*.hbs',
-
-                    'test/spec/{,**/}*.js'
+                    'test/spec/{,**/}*.js',
                 ],
-                tasks: ['exec'],
+                tasks: ["browserify:app"],
                 options: {
                     livereload: true
                 }
@@ -50,7 +75,6 @@ module.exports = function (grunt) {
                 tasks: ['handlebars']
             }*/
         },
-
         // testing server
         connect: {
             testserver: {
@@ -61,24 +85,12 @@ module.exports = function (grunt) {
                 }
             }
         },
-
-        // mocha command
-        exec: {
-            mocha: {
-                command: 'mocha-phantomjs http://localhost:<%= connect.testserver.options.port %>/test',
-                stdout: true
-            }
-        },
-
-
-
         // open app and test page
         open: {
             server: {
                 path: 'http://localhost:<%= connect.testserver.options.port %>'
             }
         },
-
         clean: {
             dist: ['.tmp', '<%= yeoman.dist %>/*'],
             server: '.tmp'
@@ -97,9 +109,6 @@ module.exports = function (grunt) {
                 'test/spec/{,*/}*.js'
             ]
         },
-
-
-
         // require
         requirejs: {
             dist: {
@@ -139,7 +148,6 @@ module.exports = function (grunt) {
                 dest: '<%= yeoman.dist %>'
             }
         },
-
         usemin: {
             html: ['<%= yeoman.dist %>/{,*/}*.html'],
             css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
@@ -147,7 +155,6 @@ module.exports = function (grunt) {
                 dirs: ['<%= yeoman.dist %>']
             }
         },
-
         imagemin: {
             dist: {
                 files: [{
@@ -158,7 +165,6 @@ module.exports = function (grunt) {
                 }]
             }
         },
-
         cssmin: {
             dist: {
                 files: {
@@ -169,7 +175,6 @@ module.exports = function (grunt) {
                 }
             }
         },
-
         htmlmin: {
             dist: {
                 options: {
@@ -191,7 +196,6 @@ module.exports = function (grunt) {
                 }]
             }
         },
-
         copy: {
             dist: {
                 files: [{
@@ -208,13 +212,11 @@ module.exports = function (grunt) {
                 }]
             }
         },
-
         bower: {
             all: {
                 rjsConfig: '<%= yeoman.app %>/scripts/main.js'
             }
         },
-
         // handlebars
         handlebars: {
             compile: {
@@ -229,31 +231,30 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.registerTask('createDefaultTemplate', function () {
         grunt.file.write('.tmp/scripts/templates.js', 'this.JST = this.JST || {};');
     });
 
-    // starts express server with live testing via testserver
-    grunt.registerTask('default', function (target) {
+    grunt.registerTask('builddev', [
+        'browserify:app',
+        'browserify:vendors',
+    ]);
 
+    grunt.registerTask('default', function (target) {
         // what is this??
         if (target === 'dist') {
             return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
         }
-
         grunt.option('force', true);
-
         grunt.task.run([
             'clean:server',
-
             'connect:testserver',
-
-            'exec',
+            "builddev",
             'open',
             'watch'
         ]);
     });
-
     // todo fix these
     grunt.registerTask('test', [
         'clean:server',
@@ -263,7 +264,6 @@ module.exports = function (grunt) {
         'connect:testserver',
         'exec:mocha'
     ]);
-
     grunt.registerTask('build', [
         'createDefaultTemplate',
         'handlebars',
@@ -278,5 +278,4 @@ module.exports = function (grunt) {
         'copy',
         'usemin'
     ]);
-
 };
