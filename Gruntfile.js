@@ -4,7 +4,7 @@ var mountFolder = function (connect, dir) {
     return connect.static(require('path').resolve(dir));
 };
 
-var vendors = 'jquery backbone backbone.marionette'.split(' ');
+var vendors = 'jquery backbone backbone.marionette handlebars'.split(' ');
 // # Globbing
 // for performance reasons we're only matching one level down:
 // 'test/spec/{,*/}*.js'
@@ -34,7 +34,7 @@ module.exports = function (grunt) {
                     debug: true,
                     extension: [".hbs"],
                     transform: ["hbsfy"],
-                    extenal: vendors
+                    external: vendors
                 }
             },
             vendors: {
