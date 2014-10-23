@@ -28,7 +28,7 @@ module.exports = function (grunt) {
         yeoman: yeomanConfig,
         browserify: {
             app: {
-                src: "scripts/app.js",
+                src: "scripts/backbone/app.js",
                 dest: "build/app.js",
                 options: {
                     debug: true,
