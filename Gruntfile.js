@@ -27,22 +27,26 @@ module.exports = function (grunt) {
     grunt.initConfig({
         yeoman: yeomanConfig,
         browserify: {
-            app: {
-                src: "scripts/backbone/app.js",
-                dest: "build/app.js",
+            dev: {
+                files: {
+                    'build/app.js': ['scripts/backbone/app.js']
+                },
                 options: {
-                    debug: true,
                     extension: [".hbs"],
                     transform: ["hbsfy"],
+                    debug: true,
                     external: vendors
                 }
             },
             vendors: {
                 files: {
-                    "build/vendors.js": []
+                    "build/vendors.js": [ "scripts/backbone/radio_config.js"]
                 },
                 options: {
-                    "require": vendors
+                    debug: true,
+                    "require": ["jquery", "backbone","handlebars", "backbone.marionette"],
+                    //transform: "scripts/backbone/main.js"
+
                 }
             },
             bundle: {
@@ -59,10 +63,10 @@ module.exports = function (grunt) {
             livereload: {
                 files: [
                     'scripts/{,**/}*.js',
-                    'templates/{,**/}*.hbs',
-                    'test/spec/{,**/}*.js',
+                    //'templates/{,**/}*.hbs',
+                    //'test/spec/{,**/}*.js',
                 ],
-                tasks: ["browserify:app"],
+                tasks: ["browserify:dev"],
                 options: {
                     livereload: true
                 }
@@ -109,39 +113,6 @@ module.exports = function (grunt) {
                 'test/spec/{,*/}*.js'
             ]
         },
-        // require
-        requirejs: {
-            dist: {
-                // Options: https://github.com/jrburke/r.js/blob/master/build/example.build.js
-                options: {
-                    // `name` and `out` is set by grunt-usemin
-                    baseUrl: 'app/scripts',
-                    optimize: 'none',
-                    paths: {
-                        'templates': '../../.tmp/scripts/templates'
-                    },
-                    // TODO: Figure out how to make sourcemaps work with grunt-usemin
-                    // https://github.com/yeoman/grunt-usemin/issues/30
-                    //generateSourceMaps: true,
-                    // required to support SourceMaps
-                    // http://requirejs.org/docs/errors.html#sourcemapcomments
-                    preserveLicenseComments: false,
-                    useStrict: true,
-                    wrap: true,
-                    //uglify2: {} // https://github.com/mishoo/UglifyJS2
-                    pragmasOnSave: {
-                        //removes Handlebars.Parser code (used to compile template strings) set
-                        //it to `false` if you need to parse template strings even after build
-                        excludeHbsParser : true,
-                        // kills the entire plugin set once it's built.
-                        excludeHbs: true,
-                        // removes i18n precompiler, handlebars and json2
-                        excludeAfterBuild: true
-                    }
-                }
-            }
-        },
-
         useminPrepare: {
             html: '<%= yeoman.app %>/index.html',
             options: {
@@ -237,8 +208,8 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('builddev', [
-        'browserify:app',
         'browserify:vendors',
+        "browserify:dev"
     ]);
 
     grunt.registerTask('default', function (target) {
