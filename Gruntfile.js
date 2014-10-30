@@ -4,7 +4,7 @@ var mountFolder = function (connect, dir) {
     return connect.static(require('path').resolve(dir));
 };
 
-var vendors = 'jquery backbone backbone.marionette handlebars'.split(' ');
+var vendors = 'jquery backbone backbone.marionette handlebars backbone.radio'.split(' ');
 // # Globbing
 // for performance reasons we're only matching one level down:
 // 'test/spec/{,*/}*.js'
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
                 },
                 options: {
                     debug: true,
-                    "require": ["jquery", "backbone","handlebars", "backbone.marionette"],
+                    "require": ["jquery", "backbone", "handlebars", "backbone.marionette", "backbone.radio"],
                     //transform: "scripts/backbone/main.js"
 
                 }

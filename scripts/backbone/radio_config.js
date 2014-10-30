@@ -1,4 +1,7 @@
 (function(root, factory) {
+    var Backbone = require("backbone");
+    var $ = require("jquery");
+    Backbone.$ = $;
     var Marionette = require("backbone.marionette");
     var Radio = require("backbone.radio");
     var _ = require("underscore");
